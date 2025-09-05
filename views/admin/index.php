@@ -1,11 +1,17 @@
 <div class="wrap">
     <h1>Identify Broken Links</h1>
 
-    <form class="" name="sblh_identifier" action="" method="">
-        <input type="text" name="post_list" placeholder="example, 12, 13, 14" />
+    <form class="form" name="sblh_identifier" style="max-width:300px; width: 100%;" action="" method="">
+        <label><b>Post List</b></label>
+        <select style="width: 100%;" name="post_list[]" multiple required>
+            <?php foreach ($posts as $item) {
+                echo '<option value="' . $item->ID . '">' . $item->post_title . '</option>';
+            } ?>
+
+        </select>
         <input type="hidden" name="action" value="find_broken_links" />
         <?php wp_nonce_field('find_broken_links', 'nonce_field') ?>
-        <button type="submit" onclick="" class="button primary-button">Submit</button>
+        <button type="submit" onclick="" style="margin-top: 10px;" class="button button-primary">Submit</button>
     </form>
 </div>
 
@@ -21,7 +27,7 @@
                 method: 'post',
                 data: $(form).serialize()
             }).done(function(res) {
-                console.log(res)
+                alert(res.message);
             })
         })
     })

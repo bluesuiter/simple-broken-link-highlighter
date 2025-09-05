@@ -38,7 +38,16 @@ class AdminController
      */
     function sblh_admin_page()
     {
-        return sblh_loadView('admin/index');
+        global $wpdb;
+        $post_table = $wpdb->prefix . 'posts';
+        $sql_qry = 'SELECT ID, post_title 
+                    FROM ' . $post_table . ' 
+                    WHERE post_type IN ("' . implode('","', SBLH_POST_TYPES) . '") 
+                    AND post_status = "publish"
+                    ORDER BY post_title ASC';
+
+        $posts = $wpdb->get_results($sql_qry);
+        return sblh_loadView('admin/index', compact('posts'));
     }
 
 
@@ -51,14 +60,15 @@ class AdminController
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_valid) {
             $post_list = $_POST['post_list'];
-            $post_list = explode(',', $post_list);
 
-            foreach ($post_list as $post_id) {
-                $html_content = get_post_field('post_content', $post_id);
-                $this->post_id = $post_id;
-                $broken_links = $this->findLinkInContent($html_content);
+            if (!empty($post_list)) {
+                foreach ($post_list as $post_id) {
+                    $html_content = get_post_field('post_content', $post_id);
+                    $this->post_id = $post_id;
+                    $broken_links = $this->findLinkInContent($html_content);
 
-                $status = update_post_meta($post_id, 'sblh_broken_links', $broken_links);
+                    $status = update_post_meta($post_id, 'sblh_broken_links', $broken_links);
+                }
             }
         }
 
